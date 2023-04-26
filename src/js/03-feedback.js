@@ -15,7 +15,7 @@ refs.form.addEventListener('submit', onFormSubmit);
 
 function onFormInput(event) {
   formData[event.target.name] = event.target.value;
-  saveToLocalStorage(formData);
+  saveDataToLocalStorage(formData);
 }
 
 function onFormSubmit(event) {
@@ -31,7 +31,7 @@ function onFormSubmit(event) {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-function saveToLocalStorage(formData) {
+function saveDataToLocalStorage(formData) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 }
 

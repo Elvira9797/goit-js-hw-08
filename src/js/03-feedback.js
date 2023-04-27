@@ -3,8 +3,6 @@ const STORAGE_KEY = 'feedback-form-state';
 
 const refs = {
   form: document.querySelector('.feedback-form'),
-  email: document.querySelector('[name="email"]'),
-  message: document.querySelector('[name="message"]'),
 };
 
 populateEmailAndTextarea();
@@ -12,44 +10,48 @@ populateEmailAndTextarea();
 refs.form.addEventListener('input', throttle(onFormInput, 500));
 refs.form.addEventListener('submit', onFormSubmit);
 
-function onFormInput() {
-  const formElements = refs.form.elements;
-  const dataForm = {
-    email: formElements.email.value,
-    message: formElements.message.value,
-  };
+let formData = {};
 
-  saveDataToLocalStorage(dataForm);
+function onFormInput(event) {
+  formData[event.target.name] = event.target.value.trim();
+
+  saveDataToLocalStorage(formData);
 }
 
 function onFormSubmit(event) {
   event.preventDefault();
 
-  const formElements = event.target.elements;
-
-  console.log({
-    email: formElements.email.value,
-    message: formElements.message.value,
-  });
+  console.log(getDataFromLocalStorage());
 
   event.target.reset();
   removeDataFromLocaleStorage();
 }
 
-function saveDataToLocalStorage(dataForm) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(dataForm));
+function saveDataToLocalStorage(formData) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 }
 
 function removeDataFromLocaleStorage() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-function populateEmailAndTextarea() {
-  const savedData = localStorage.getItem(STORAGE_KEY);
-
-  if (savedData) {
-    const parcedObj = JSON.parse(savedData);
-    refs.email.value = parcedObj.email;
-    refs.message.value = parcedObj.message;
+function getDataFromLocalStorage() {
+  try {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      return JSON.parse(savedData);
+    } else {
+      return {};
+    }
+  } catch (error) {
+    console.error('Get state error: ', error.message);
   }
+}
+
+function populateEmailAndTextarea() {
+  const parsedData = getDataFromLocalStorage();
+
+  Object.entries(parsedData).forEach(
+    ([key, value]) => (refs.form[key].value = value)
+  );
 }
